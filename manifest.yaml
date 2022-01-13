@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: urlmap-notify-worker
+  name: urlmap-notify-worker
+  namespace: urlmap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: urlmap-notify-worker
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: urlmap-notify-worker
+    spec:
+      serviceAccount: urlmap-notify-worker
+      containers:
+      - image: us-central1-docker.pkg.dev/shingo-ar-proto/myrepo/urlmap-notify-worker:${TAG}
+        name: urlmap-notify-worker
+        resources: {}
+        env:
+        - name: SLACK_URL
+          valueFrom:
+            secretKeyRef:
+              name: notify-worker
+              key: slack-url
+        - name: SUBSCRIPTION
+          value: do-notify
+        - name: PROJECT
+          value: $PROJECT
+status: {}
