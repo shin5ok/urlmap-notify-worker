@@ -19,7 +19,7 @@ func init() {
 }
 
 var ProjectId = os.Getenv("PROJECT")
-var Subscription = os.Getenv("Subscription")
+var Subscription = os.Getenv("SUBSCRIPTION")
 var SlackURL = os.Getenv("SLACK_URL")
 
 func main() {
