@@ -33,6 +33,13 @@ type SlackStruct struct {
 	SlackChannel string
 }
 
+type dataJson struct {
+	Message  string `json:"message"`
+	SlackUrl string `json:"slack_url"`
+	Email    string `json:"email"`
+	NotifyTo string `json:"notify_to"`
+}
+
 func main() {
 	client, err := pubsub.NewClient(context.Background(), projectId)
 	if err != nil {
@@ -41,8 +48,10 @@ func main() {
 	sub := client.Subscription(subscription)
 	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
 		// http.PostForm(SlackURL, )
-		s := SlackStruct{SlackUrl: slackUrl, SlackChannel: "#log"}
-		s.NotifyToSlack(string(m.Data))
+		d := dataJson{}
+		json.Unmarshal([]byte(m.Data), &d)
+		s := SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#log"}
+		s.NotifyToSlack(string(d.Message))
 		log.Info().Msgf("%+v", string(m.Data))
 		m.Ack()
 	})
