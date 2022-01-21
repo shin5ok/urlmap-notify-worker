@@ -25,7 +25,11 @@ func init() {
 
 var projectId = os.Getenv("PROJECT")
 var subscription = os.Getenv("SUBSCRIPTION")
-var slackUrl = os.Getenv("SLACK_URL")
+
+/*
+  Not use because slackUrl will be pulled from message
+	var slackUrl = os.Getenv("SLACK_URL")
+*/
 
 // to use slack auth parameter
 type SlackStruct struct {
