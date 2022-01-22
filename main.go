@@ -72,25 +72,36 @@ func (s *SlackStruct) Send(message string) error {
 	}
 }
 
+type Dummy struct{}
+
+func (d *Dummy) Send(message string) error {
+	log.Info().Msgf("dummy: %+v", d)
+	return nil
+}
+
 func main() {
 	client, err := pubsub.NewClient(context.Background(), projectId)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
 	sub := client.Subscription(subscription)
-	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
+	cctx, cancel := context.WithCancel(context.Background())
+	err = sub.Receive(cctx, func(ctx context.Context, m *pubsub.Message) {
 
 		d := dataJson{}
-		json.Unmarshal([]byte(m.Data), &d)
-		x := strings.Split("#", d.NotifyTo)
+		if err := json.Unmarshal([]byte(m.Data), &d); err != nil {
+			log.Error().Err(err)
+			cancel()
+		}
+		x := strings.Split(d.NotifyTo, "#")
 
 		var s notifyInterface
 		switch x[0] {
 		case "slack":
-			s = &SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: x[1]}
+			s = &SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#" + x[1]}
 		default:
-			log.Error().Msgf("%+v", x)
-
+			s = &Dummy{}
+			log.Error().Msgf("default > %+v", x)
 		}
 		NotifyDo(s, string(d.Message))
 		log.Info().Msgf("%+v", string(m.Data))
