@@ -44,27 +44,15 @@ type dataJson struct {
 	NotifyTo string `json:"notify_to"`
 }
 
-func main() {
-	client, err := pubsub.NewClient(context.Background(), projectId)
-	if err != nil {
-		log.Fatal().Err(err)
-	}
-	sub := client.Subscription(subscription)
-	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
-		// http.PostForm(SlackURL, )
-		d := dataJson{}
-		json.Unmarshal([]byte(m.Data), &d)
-		s := SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#log"}
-		s.NotifyToSlack(string(d.Message))
-		log.Info().Msgf("%+v", string(m.Data))
-		m.Ack()
-	})
-	if err != nil {
-		log.Error().Err(err)
-	}
+type notifyInterface interface {
+	Send(message string) error
 }
 
-func (s *SlackStruct) NotifyToSlack(message string) error {
+func NotifyDo(n notifyInterface, message string) {
+	n.Send(message)
+}
+
+func (s *SlackStruct) Send(message string) error {
 	channel := s.SlackChannel
 	url := s.SlackUrl
 	body, _ := json.Marshal(map[string]string{"text": message, "channel": channel})
@@ -80,5 +68,26 @@ func (s *SlackStruct) NotifyToSlack(message string) error {
 		content, _ := ioutil.ReadAll(res.Body)
 		log.Info().Msg(string(content))
 		return nil
+	}
+}
+
+func main() {
+	client, err := pubsub.NewClient(context.Background(), projectId)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
+	sub := client.Subscription(subscription)
+	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
+		// http.PostForm(SlackURL, )
+		d := dataJson{}
+		json.Unmarshal([]byte(m.Data), &d)
+		s := SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#log"}
+		NotifyDo(&s, string(d.Message))
+		// s.Send(string(d.Message))
+		log.Info().Msgf("%+v", string(m.Data))
+		m.Ack()
+	})
+	if err != nil {
+		log.Error().Err(err)
 	}
 }
