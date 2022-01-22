@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/pubsub"
@@ -78,12 +79,20 @@ func main() {
 	}
 	sub := client.Subscription(subscription)
 	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
-		// http.PostForm(SlackURL, )
+
 		d := dataJson{}
 		json.Unmarshal([]byte(m.Data), &d)
-		s := SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#log"}
-		NotifyDo(&s, string(d.Message))
-		// s.Send(string(d.Message))
+		x := strings.Split("#", d.NotifyTo)
+
+		var s notifyInterface
+		switch x[0] {
+		case "slack":
+			s = &SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: x[1]}
+		default:
+			log.Error().Msgf("%+v", x)
+
+		}
+		NotifyDo(s, string(d.Message))
 		log.Info().Msgf("%+v", string(m.Data))
 		m.Ack()
 	})
