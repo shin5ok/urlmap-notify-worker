@@ -14,7 +14,6 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
-	// "github.com/gin-gonic/gin"
 )
 
 func init() {
@@ -49,8 +48,11 @@ type notifyInterface interface {
 	Send(message string) error
 }
 
-func NotifyDo(n notifyInterface, message string) {
-	n.Send(message)
+type Dummy struct{}
+
+func (d *Dummy) Send(message string) error {
+	log.Info().Msgf("dummy: %+v", d)
+	return nil
 }
 
 func (s *SlackStruct) Send(message string) error {
@@ -72,11 +74,8 @@ func (s *SlackStruct) Send(message string) error {
 	}
 }
 
-type Dummy struct{}
-
-func (d *Dummy) Send(message string) error {
-	log.Info().Msgf("dummy: %+v", d)
-	return nil
+func NotifyDo(n notifyInterface, message string) {
+	n.Send(message)
 }
 
 func main() {
@@ -101,7 +100,7 @@ func main() {
 			s = &SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#" + x[1]}
 		default:
 			s = &Dummy{}
-			log.Error().Msgf("default > %+v", x)
+			log.Error().Msgf("Dummy for default > %+v", x)
 		}
 		NotifyDo(s, string(d.Message))
 		log.Info().Msgf("%+v", string(m.Data))
