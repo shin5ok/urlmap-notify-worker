@@ -55,6 +55,12 @@ func (d *Dummy) Send(message string) error {
 	return nil
 }
 
+type Email struct{}
+
+func (e *Email) Send(message string) error {
+	return nil
+}
+
 func (s *SlackStruct) Send(message string) error {
 	channel := s.SlackChannel
 	url := s.SlackUrl
