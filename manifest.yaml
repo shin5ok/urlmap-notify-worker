@@ -20,7 +20,7 @@ spec:
     spec:
       serviceAccount: urlmap-notify-worker
       containers:
-      - image: us-central1-docker.pkg.dev/shingo-ar-proto/myrepo/urlmap-notify-worker:${TAG}
+      - image: us-central1-docker.pkg.dev/${PROJECT}/myrepo/urlmap-notify-worker:${TAG}
         name: urlmap-notify-worker
         resources: {}
         env:
