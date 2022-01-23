@@ -100,7 +100,7 @@ func main() {
 			s = &SlackStruct{SlackUrl: d.SlackUrl, SlackChannel: "#" + x[1]}
 		default:
 			s = &Dummy{}
-			log.Error().Msgf("Dummy for default > %+v", x)
+			log.Info().Msgf("Do nothing for default > %+v", x)
 		}
 		NotifyDo(s, string(d.Message))
 		log.Info().Msgf("%+v", string(m.Data))
