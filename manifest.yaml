@@ -18,6 +18,13 @@ spec:
       labels:
         app: urlmap-notify-worker
     spec:
+      nodeSelector:
+        cloud.google.com/gke-spot: "true"
+      tolerations:
+      - key: cloud.google.com/gke-spot
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
       serviceAccount: urlmap-notify-worker
       containers:
       - image: us-central1-docker.pkg.dev/${PROJECT}/myrepo/urlmap-notify-worker:${TAG}
