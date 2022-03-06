@@ -14,6 +14,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
+	"github.com/shin5ok/shoutouthostnamegcp"
 )
 
 func init() {
@@ -21,6 +22,8 @@ func init() {
 	zerolog.LevelFieldName = "severity"
 	zerolog.TimestampFieldName = "timestamp"
 	zerolog.TimeFieldFormat = time.RFC3339Nano
+
+	shoutouthostnamegcp.SetSigHandler(os.Getenv("SLACK_URL"), os.Getenv("SLACK_CHANNEL"))
 }
 
 var projectId = os.Getenv("PROJECT")
