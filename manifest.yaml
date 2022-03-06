@@ -40,4 +40,6 @@ spec:
           value: do-notify
         - name: PROJECT
           value: $PROJECT
+        - name: SLACK_CHANNEL
+          value: "kawano"
 status: {}
