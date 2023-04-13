@@ -58,9 +58,13 @@ func (d *Dummy) Send(message string) error {
 	return nil
 }
 
-type Email struct{}
+type Email struct {
+	To string
+}
 
 func (e *Email) Send(message string) error {
+	/* TO DO */
+	log.Info().Msgf("Sending mail to %s", e.To)
 	return nil
 }
 
